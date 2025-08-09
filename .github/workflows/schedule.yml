@@ -1,0 +1,30 @@
+name: YouTube Daily Upload
+
+on:
+  schedule:
+    - cron: '0 1 * * *'   # 6 AM Pakistan
+    - cron: '0 3 * * *'   # 8 AM Pakistan  
+    - cron: '0 12 * * *'  # 5 PM Pakistan
+    - cron: '0 15 * * *'  # 8 PM Pakistan
+  workflow_dispatch:
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - uses: actions/cache@v3
+        with:
+          path: |
+            videos/
+            progress.json
+          key: videos-cache
+      
+      - run: |
+          sudo apt-get install -y ffmpeg
+          pip install yt-dlp google-api-python-client
+          
+      - env:
+          CHANNEL_URL: ${{ secrets.CHANNEL_URL }}
+        run: python run.py
